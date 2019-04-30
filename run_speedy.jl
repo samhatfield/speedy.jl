@@ -4,6 +4,7 @@ Real = Float64
 include("src/literals.jl")
 include("src/params.jl")
 include("src/physical_constants.jl")
+include("src/dynamical_constants.jl")
 include("src/date.jl")
 include("src/geometry.jl")
 include("src/legendre.jl")
