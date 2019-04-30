@@ -2,6 +2,7 @@ include("src/params.jl")
 include("src/physical_constants.jl")
 include("src/date.jl")
 include("src/geometry.jl")
+include("src/legendre.jl")
 
 # Time step counter
 model_step = 1
