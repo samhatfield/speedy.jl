@@ -1,0 +1,6 @@
+const one   = Real(1.0)
+const zero  = Real(0.0)
+const two   = Real(2.0)
+const four  = Real(4.0)
+const half  = Real(0.5)
+const quart = Real(0.25)
