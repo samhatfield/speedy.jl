@@ -1,7 +1,7 @@
 using FFTW
 
 # Transforms Fourier coefficients to grid-point data.
-function fourier_inv(input, scale_by_coslat)
+function fourier_inv(input; scale=false)
     output = zeros(Real, nlon, nlat)
 
     for j in 1:nlat
@@ -9,7 +9,7 @@ function fourier_inv(input, scale_by_coslat)
         output[:,j] = Real(nlon)*irfft(vcat(input[:,j], zeros(Complex{Real}, div(96,2)+1-mx)), nlon)
 
         # Scale by cosine(lat) if needed
-        if scale_by_coslat
+        if scale
             output[:,j] *= cosgr[j]
         end
     end
