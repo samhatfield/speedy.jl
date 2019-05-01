@@ -8,6 +8,7 @@ include("src/dynamical_constants.jl")
 include("src/date.jl")
 include("src/geometry.jl")
 include("src/legendre.jl")
+include("src/fourier.jl")
 include("src/geopotential.jl")
 
 # Time step counter
