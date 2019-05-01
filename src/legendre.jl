@@ -124,6 +124,9 @@ end
 
 # Computes inverse Legendre transformation
 function legendre_inv(input)
+    # Initialize output array
+    output = zeros(Complex{Real}, mx, nlat)
+
     # Loop over Northern Hemisphere, computing odd and even decomposition of incoming field
     for j in 1:div(nlat,2)
         j1 = nlat + 1 - j
@@ -134,14 +137,14 @@ function legendre_inv(input)
 
         # Compute even decomposition
         for n in 1:2:nx
-            for m in 1:nsh2(n)
+            for m in 1:nsh2[n]
                 even[m] = even[m] + input[m,n]*polys[m,n,j]
             end
         end
 
         # Compute odd decomposition
-        for n in 2:2nx
-            for m in 1:nsh2(n)
+        for n in 2:2:nx
+            for m in 1:nsh2[n]
                 odd[m] = odd[m] + input[m,n]*polys[m,n,j]
             end
         end
@@ -152,12 +155,16 @@ function legendre_inv(input)
         # Compute Northern Hemisphere
         output[:,j]  = even - odd
     end
+    output
 end
 
 # Computes direct Legendre transformation
 function legendre_dir(input)
     # Initialise output array
     output = zeros(Complex{Real}, mx, nx)
+
+    even = zeros(Complex{Real}, mx, div(nlat,2))
+    odd  = zeros(Complex{Real}, mx, div(nlat,2))
 
     # Loop over Northern Hemisphere, computing odd and even decomposition of
     # incoming field. The Legendre weights (wt) are applied here
@@ -176,15 +183,16 @@ function legendre_dir(input)
 
     # Loop over coefficients corresponding to even associated Legendre polynomials
     for n in 1:2:trunc+1
-        for m in 1:nsh2(n)
-            output[m,n] = dot(cpol[m,n,1:iy], even[m,1:iy])
+        for m in 1:nsh2[n]
+            output[m,n] = dot(polys[m,n,:], even[m,:])
         end
     end
 
     # Loop over coefficients corresponding to odd associated Legendre polynomials
-    for n in 2:2trunc+1
-        for m in 1:nsh2(n)
-            output[m,n] = dot(cpol[m,n,1:iy], odd[m,1:iy])
+    for n in 2:2:trunc+1
+        for m in 1:nsh2[n]
+            output[m,n] = dot(polys[m,n,:], odd[m,:])
         end
     end
+    output
 end
