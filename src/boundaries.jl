@@ -18,7 +18,7 @@ end
 ϕ₀ = g*load_boundary_file("surface.nc", "orog")
 
 # Also store spectrally truncated surface geopotential
-ϕ₀_s = spectral_truncation(ϕ₀)
+ϕ₀ₛ = spectral_truncation(ϕ₀)
 
 # Read land-sea mask
 land_sea_mask = load_boundary_file("surface.nc", "lsm")
