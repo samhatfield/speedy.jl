@@ -105,8 +105,8 @@ function vds!(ucosm, vcosm, vorm, divm)
 end
 
 function uvspec!(vorm, divm, ucosm, vcosm )
-    zp = uvdx*vorm*Complex{Real}(0.0 + 1.0im)
-    zc = uvdx*divm*Complex{Real}(0.0 + 1.0im)
+    zp = uvdx.*vorm*Complex{Real}(0.0 + 1.0im)
+    zc = uvdx.*divm*Complex{Real}(0.0 + 1.0im)
 
     for m in 1:mx
         ucosm[m,1]  =  zc[m,1] - uvdyp[m,1]*vorm[m,2]
