@@ -9,10 +9,10 @@ const n_trace = 1         # Number of tracers
 
 # Time stepping parameters
 const n_steps_day     = 36                            # Number of time steps in one day
-const Δt              = Real(86400.0/n_steps_day) # Time step in seconds
-const rob             = Real(0.05)                # Damping factor in Robert time filter
-const wil             = Real(0.53)                # Parameter of Williams filter
-const α               = Real(0.5)                 # Coefficient for semi-implicit computations
+const Δt              = RealType(86400.0/n_steps_day) # Time step in seconds
+const rob             = RealType(0.05)                # Damping factor in Robert time filter
+const wil             = RealType(0.53)                # Parameter of Williams filter
+const α               = RealType(0.5)                 # Coefficient for semi-implicit computations
                                                       # 0 -> forward step for gravity wave terms,
                                                       # 1 -> backward implicit
                                                       # 0.5 -> centered implicit

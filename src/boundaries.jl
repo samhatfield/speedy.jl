@@ -6,7 +6,7 @@ function spectral_truncation(input)
         for m in 1:mx
             N = m + n - 2
             if N > trunc
-                input_sp[m,n] = Complex{Real}(zero)
+                input_sp[m,n] = Complex{RealType}(zero)
             end
         end
     end

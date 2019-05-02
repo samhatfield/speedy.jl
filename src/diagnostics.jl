@@ -2,7 +2,7 @@
 # Also stops the integration if the computed diagnostics are outside of
 # allowable ranges.
 function check_diagnostics(vor, div, tem, step)
-    diagnostics = zeros(Real, nlev, 3)
+    diagnostics = zeros(RealType, nlev, 3)
 
     # 1. Get global-mean temperature and compute eddy kinetic energy
     for k in 1:nlev

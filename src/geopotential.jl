@@ -1,6 +1,6 @@
 # Coefficients to compute geopotential
-xgeop1 = zeros(Real, nlev)
-xgeop2 = zeros(Real, nlev)
+xgeop1 = zeros(RealType, nlev)
+xgeop2 = zeros(RealType, nlev)
 for k in 1:nlev
     xgeop1[k] = R*log(hsg[k+1]/fsg[k])
     if k != nlev

@@ -5,17 +5,17 @@ npowhd = four
 
 # Coefficients for horizontal diffusion
 # Spectral damping coefficients
-hdiff = one/(thd *Real(3600.0))
-hdifd = one/(thdd*Real(3600.0))
-hdifs = one/(thds*Real(3600.0))
-rlap  = one/Real(trunc*(trunc+1))
+hdiff = one/(thd *RealType(3600.0))
+hdifd = one/(thdd*RealType(3600.0))
+hdifs = one/(thds*RealType(3600.0))
+rlap  = one/RealType(trunc*(trunc+1))
 
-dmp = zeros(Real, mx, nx)
-dmpd = zeros(Real, mx, nx)
-dmps = zeros(Real, mx,nx)
+dmp = zeros(RealType, mx, nx)
+dmpd = zeros(RealType, mx, nx)
+dmps = zeros(RealType, mx,nx)
 for j in 1:nx
     for k in 1:mx
-        N = Real(k +j - 2)
+        N = RealType(k +j - 2)
         elap = (N*(N + one)*rlap)
         elapn = elap^npowhd
         dmp[k,j]  = hdiff*elapn
@@ -26,11 +26,11 @@ end
 
 # 5.2 Orographic correction terms for temperature and humidity
 #     (vertical component)
-rgam = R*γ/(Real(1000.0)*g)
+rgam = R*γ/(RealType(1000.0)*g)
 qexp = hscale/hshum
 
-tcorv = zeros(Real, nlev)
-qcorv = zeros(Real, nlev)
+tcorv = zeros(RealType, nlev)
+qcorv = zeros(RealType, nlev)
 for k in 2:nlev
     tcorv[k] = fsg[k]^rgam
     if k > 2

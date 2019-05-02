@@ -1,8 +1,8 @@
 function initialize_from_rest!(vorU, divU, tem, pₛ, tr, ϕₛ)
-    surfg = zeros(Real, nlon, nlat)
+    surfg = zeros(RealType, nlon, nlat)
 
     # Lapse rate (in K/m) scaled by gravity
-    γ_g = γ/(Real(1000.0)*g)
+    γ_g = γ/(RealType(1000.0)*g)
 
     # 1. Compute spectral surface geopotential
     ϕₛ = grid_to_spec(ϕ₀ₛ)
@@ -13,15 +13,15 @@ function initialize_from_rest!(vorU, divU, tem, pₛ, tr, ϕₛ)
     # 2.2 Set reference temperature :
     #     tropos:  T = 288 degK at z = 0, constant lapse rate
     #     stratos: T = 216 degK, lapse rate = 0
-    tem_ref  = Real(288.0)
-    tem_top  = Real(216.0)
+    tem_ref  = RealType(288.0)
+    tem_top  = RealType(216.0)
 
     # Surface and stratospheric air temperature
     surfs = -γ_g*ϕₛ
 
-    tem[1,1,1,1] = √(two)*Complex{Real}(one)*tem_top
-    tem[1,1,2,1] = √(two)*Complex{Real}(one)*tem_top
-    surfs[1,1] = √(two)*Complex{Real}(one)*tem_ref - γ_g*ϕₛ[1,1]
+    tem[1,1,1,1] = √(two)*Complex{RealType}(one)*tem_top
+    tem[1,1,2,1] = √(two)*Complex{RealType}(one)*tem_top
+    surfs[1,1] = √(two)*Complex{RealType}(one)*tem_ref - γ_g*ϕₛ[1,1]
 
     # Temperature at tropospheric levels
     for k in 3:nlev
@@ -32,7 +32,7 @@ function initialize_from_rest!(vorU, divU, tem, pₛ, tr, ϕₛ)
     #     p_ref = 1013 hPa at z = 0
     for j in 1:nlat
         for i in 1:nlon
-            surfg[i,j] = log(Real(1.013)) + log(one - γ_g*ϕ₀ₛ[i,j]/tem_ref)/(R*γ_g)
+            surfg[i,j] = log(RealType(1.013)) + log(one - γ_g*ϕ₀ₛ[i,j]/tem_ref)/(R*γ_g)
         end
     end
 
@@ -40,8 +40,8 @@ function initialize_from_rest!(vorU, divU, tem, pₛ, tr, ϕₛ)
 
     # 2.4 Set tropospheric specific humidity in g/kg
     #     Qref = RHref * Qsat(288K, 1013hPa)
-    esref = Real(17.0)
-    qref = refrh1*Real(0.622)*esref
+    esref = RealType(17.0)
+    qref = refrh1*RealType(0.622)*esref
     qexp = hscale/hshum
 
     # Specific humidity at the surface
@@ -66,14 +66,14 @@ function initialize_from_rest!(vorU, divU, tem, pₛ, tr, ϕₛ)
 end
 
 # Prognostic spectral variables (updated in step)
-vorU = zeros(Complex{Real}, mx, nx, nlev, 2)          # Vorticity
-divU = zeros(Complex{Real}, mx, nx, nlev, 2)          # Divergence
-tem = zeros(Complex{Real}, mx, nx, nlev, 2)          # Absolute temperature
-pₛ  = zeros(Complex{Real}, mx, nx, 2)                # Log of (normalised) surface pressure (p_s/p0)
-tr  = zeros(Complex{Real}, mx, nx, nlev, 2, n_trace) # Tracers (tr[1]: specific humidity in g/kg)
+vorU = zeros(Complex{RealType}, mx, nx, nlev, 2)          # Vorticity
+divU = zeros(Complex{RealType}, mx, nx, nlev, 2)          # Divergence
+tem = zeros(Complex{RealType}, mx, nx, nlev, 2)          # Absolute temperature
+pₛ  = zeros(Complex{RealType}, mx, nx, 2)                # Log of (normalised) surface pressure (p_s/p0)
+tr  = zeros(Complex{RealType}, mx, nx, nlev, 2, n_trace) # Tracers (tr[1]: specific humidity in g/kg)
 
 # Geopotential
-ϕ  = zeros(Complex{Real}, mx, nx, nlev) # Atmospheric geopotential
-ϕₛ = zeros(Complex{Real}, mx, nx)     # Surface geopotential
+ϕ  = zeros(Complex{RealType}, mx, nx, nlev) # Atmospheric geopotential
+ϕₛ = zeros(Complex{RealType}, mx, nx)     # Surface geopotential
 
 initialize_from_rest!(vorU, divU, tem, pₛ, tr, ϕₛ)

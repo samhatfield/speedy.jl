@@ -10,7 +10,7 @@ function load_boundary_file(file_name, field_name)
 
     # Fix undefined values
     raw_input[raw_input .<= -999.0] .= 0.0
-    convert(Array{Real}, raw_input)
+    convert(Array{RealType}, raw_input)
 end
 
 function output(timestep)
@@ -60,15 +60,15 @@ function output(timestep)
     NetCDF.putvar(nc, "lev", fsg)
 
     # Convert prognostic fields from spectral space to grid point space
-    u_grid = zeros(Real, nlon, nlat, nlev)
-    v_grid = zeros(Real, nlon, nlat, nlev)
-    t_grid = zeros(Real, nlon, nlat, nlev)
-    q_grid = zeros(Real, nlon, nlat, nlev)
-    ϕ_grid = zeros(Real, nlon, nlat, nlev)
-    pₛ_grid = zeros(Real, nlon, nlat)
+    u_grid = zeros(RealType, nlon, nlat, nlev)
+    v_grid = zeros(RealType, nlon, nlat, nlev)
+    t_grid = zeros(RealType, nlon, nlat, nlev)
+    q_grid = zeros(RealType, nlon, nlat, nlev)
+    ϕ_grid = zeros(RealType, nlon, nlat, nlev)
+    pₛ_grid = zeros(RealType, nlon, nlat)
     for k in 1:nlev
-        ucos = zeros(Real, mx, nx)
-        vcos = zeros(Real, mx, nx)
+        ucos = zeros(RealType, mx, nx)
+        vcos = zeros(RealType, mx, nx)
         uvspec!(vorU[:,:,k,1], divU[:,:,k,1], ucos, vcos)
         u_grid[:,:,k] = spec_to_grid(ucos, scale=true)
         v_grid[:,:,k] = spec_to_grid(vcos, scale=true)

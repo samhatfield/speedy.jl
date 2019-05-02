@@ -7,14 +7,14 @@ using LinearAlgebra
 # Beginning of function definitions
 # =============================================================================
 function get_weights()
-    z1 = Real(2.0)
-    eps = Real(3.0e-14)
+    z1 = RealType(2.0)
+    eps = RealType(3.0e-14)
 
-    wt = zeros(Real, div(nlat,2))
+    wt = zeros(RealType, div(nlat,2))
 
     for i in 1:div(nlat,2)
         local pp
-        z = cos(Real(π)*(Real(i) - quart)/(Real(nlat) + half))
+        z = cos(RealType(π)*(RealType(i) - quart)/(RealType(nlat) + half))
         while abs(z - z1) > eps
             p1 = one
             p2 = zero
@@ -22,10 +22,10 @@ function get_weights()
             for j in 1:nlat
                 p3 = p2
                 p2 = p1
-                p1 = ((two*Real(j) - one)*z*p2 - (Real(j) - one)*p3)/Real(j)
+                p1 = ((two*RealType(j) - one)*z*p2 - (RealType(j) - one)*p3)/RealType(j)
             end
 
-            pp = Real(nlat)*(z*p1 - p2)/(z^two - one)
+            pp = RealType(nlat)*(z*p1 - p2)/(z^two - one)
             z1 = z
             z = z1 - p1/pp
         end
@@ -36,8 +36,8 @@ function get_weights()
 end
 
 function get_legendre_poly(j)
-    small = Real(1.0e-30)
-    alp = zeros(Real, mx+1,nx)
+    small = RealType(1.0e-30)
+    alp = zeros(RealType, mx+1,nx)
 
     y = coslat_half[j]
     x = sinlat_half[j]
@@ -91,13 +91,13 @@ for n in 1:nx
     end
 end
 
-consq = zeros(Real, mx+1)
+consq = zeros(RealType, mx+1)
 for m in 2:mx+1
-    consq[m] = √(half*(two*Real(m - 1) + one)/Real(m - 1))
+    consq[m] = √(half*(two*RealType(m - 1) + one)/RealType(m - 1))
 end
 
-ε   = zeros(Real, mx+1,nx+1)
-ε⁻¹ = zeros(Real, mx+1,nx+1)
+ε   = zeros(RealType, mx+1,nx+1)
+ε⁻¹ = zeros(RealType, mx+1,nx+1)
 for m in 1:mx+1
     for n in 1:nx+1
         if n == nx + 1
@@ -105,8 +105,8 @@ for m in 1:mx+1
         elseif n == 1 && m == 1
             ε[m,n] = zero
         else
-            ε[m,n] = √((Real(n + m - 2)^two - Real(m - 1)^two)/
-                (four*Real(n + m - 2)^two - one))
+            ε[m,n] = √((RealType(n + m - 2)^two - RealType(m - 1)^two)/
+                (four*RealType(n + m - 2)^two - one))
         end
         if ε[m,n] > zero
             ε⁻¹[m,n] = one/ε[m,n]
@@ -116,7 +116,7 @@ end
 
 # Generate associated Legendre polynomials
 # get_legendre_poly computes the polynomials at a particular latitiude
-polys = zeros(Complex{Real}, mx,nx,div(nlat,2))
+polys = zeros(Complex{RealType}, mx,nx,div(nlat,2))
 for j in 1:div(nlat,2)
     poly = get_legendre_poly(j)
     polys[:,:,j] = poly
@@ -125,15 +125,15 @@ end
 # Computes inverse Legendre transformation
 function legendre_inv(input)
     # Initialize output array
-    output = zeros(Complex{Real}, mx, nlat)
+    output = zeros(Complex{RealType}, mx, nlat)
 
     # Loop over Northern Hemisphere, computing odd and even decomposition of incoming field
     for j in 1:div(nlat,2)
         j1 = nlat + 1 - j
 
         # Initialise arrays
-        even = zeros(Complex{Real}, mx)
-        odd  = zeros(Complex{Real}, mx)
+        even = zeros(Complex{RealType}, mx)
+        odd  = zeros(Complex{RealType}, mx)
 
         # Compute even decomposition
         for n in 1:2:nx
@@ -161,10 +161,10 @@ end
 # Computes direct Legendre transformation
 function legendre_dir(input)
     # Initialise output array
-    output = zeros(Complex{Real}, mx, nx)
+    output = zeros(Complex{RealType}, mx, nx)
 
-    even = zeros(Complex{Real}, mx, div(nlat,2))
-    odd  = zeros(Complex{Real}, mx, div(nlat,2))
+    even = zeros(Complex{RealType}, mx, div(nlat,2))
+    odd  = zeros(Complex{RealType}, mx, div(nlat,2))
 
     # Loop over Northern Hemisphere, computing odd and even decomposition of
     # incoming field. The Legendre weights (wt) are applied here

@@ -3,19 +3,19 @@
 #  el4 = el2^2.0 ; for biharmonic diffusion
 #  elm2 = 1./el2
 #  trfilt used to filter out "non-triangular" part of rhomboidal truncation
-el2 = zeros(Real, mx,nx)
-el2⁻¹ = zeros(Real, mx,nx)
-el4 = zeros(Real, mx,nx)
-trfilt = zeros(Complex{Real}, mx,nx)
+el2 = zeros(RealType, mx,nx)
+el2⁻¹ = zeros(RealType, mx,nx)
+el4 = zeros(RealType, mx,nx)
+trfilt = zeros(Complex{RealType}, mx,nx)
 for n in 1:nx
     for m in 1:mx
         N = m - 2 + n
-        el2[m,n] = Real(N*(N + 1))/rearth^two
+        el2[m,n] = RealType(N*(N + 1))/rearth^two
         el4[m,n] = el2[m,n]^two
         if N <= trunc
-            trfilt[m,n] = Complex{Real}(one)
+            trfilt[m,n] = Complex{RealType}(one)
         else
-            trfilt[m,n] = Complex{Real}(zero)
+            trfilt[m,n] = Complex{RealType}(zero)
         end
     end
 end
@@ -25,26 +25,26 @@ el2⁻¹[2:mx,:] = one./el2[2:mx,:]
 el2⁻¹[1,2:nx] = one./el2[1,2:nx]
 
 # Quantities required by functions grad, uvspec, and vds
-gradx = zeros(Real, mx)
-uvdx = zeros(Real, mx,nx)
-uvdym = zeros(Real, mx,nx)
-uvdyp = zeros(Real, mx,nx)
-gradym = zeros(Real, mx,nx)
-gradyp = zeros(Real, mx,nx)
-vddym = zeros(Real, mx,nx)
-vddyp = zeros(Real, mx,nx)
+gradx = zeros(RealType, mx)
+uvdx = zeros(RealType, mx,nx)
+uvdym = zeros(RealType, mx,nx)
+uvdyp = zeros(RealType, mx,nx)
+gradym = zeros(RealType, mx,nx)
+gradyp = zeros(RealType, mx,nx)
+vddym = zeros(RealType, mx,nx)
+vddyp = zeros(RealType, mx,nx)
 for m in 1:mx
     for n in 1:nx
         m1 = m - 1
         m2 = m1 + 1
-        el1 = Real(m - 2 + n)
+        el1 = RealType(m - 2 + n)
         if n == 1
-            gradx[m]   = Real(m1)/rearth
-            uvdx[m,1]  = -rearth/Real(m1 + 1)
+            gradx[m]   = RealType(m1)/rearth
+            uvdx[m,1]  = -rearth/RealType(m1 + 1)
             uvdym[m,1] = zero
             vddym[m,1] = zero
         else
-            uvdx[m,n]   = -rearth*Real(m1)/(el1*(el1 + one))
+            uvdx[m,n]   = -rearth*RealType(m1)/(el1*(el1 + one))
             gradym[m,n] = (el1 - one)*ε[m2,n]/rearth
             uvdym[m,n]  = -rearth*ε[m2,n]/el1
             vddym[m,n]  = (el1 + one)*ε[m2,n]/rearth
@@ -105,8 +105,8 @@ function vds!(ucosm, vcosm, vorm, divm)
 end
 
 function uvspec!(vorm, divm, ucosm, vcosm )
-    zp = uvdx.*vorm*Complex{Real}(0.0 + 1.0im)
-    zc = uvdx.*divm*Complex{Real}(0.0 + 1.0im)
+    zp = uvdx.*vorm*Complex{RealType}(0.0 + 1.0im)
+    zc = uvdx.*divm*Complex{RealType}(0.0 + 1.0im)
 
     for m in 1:mx
         ucosm[m,1]  =  zc[m,1] - uvdyp[m,1]*vorm[m,2]

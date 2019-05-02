@@ -1,5 +1,5 @@
 # Define global model precision
-Real = Float64
+RealType = Float64
 
 include("src/literals.jl")
 include("src/params.jl")
