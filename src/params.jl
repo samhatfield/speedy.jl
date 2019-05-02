@@ -16,3 +16,7 @@ const α               = Real(0.5)                 # Coefficient for semi-implic
                                                       # 0 -> forward step for gravity wave terms,
                                                       # 1 -> backward implicit
                                                       # 0.5 -> centered implicit
+
+# Output parameters
+const nstdia = 36*5  # Period (number of steps) for diagnostic print-out
+const nsteps_out = 1 # Number of time steps between outputs
