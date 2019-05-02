@@ -81,7 +81,6 @@ function output(timestep)
     println("Writing output file for $(Dates.format(current_datetime, "YYYY-mm-dd HH:MM:00"))")
 
     # Write prognostic variables to file
-    println(timestep)
     NetCDF.putvar(nc, "u",   Float32.(u_grid),  start=[1,1,1,timestep+1], count=[-1,-1,-1,1])
     NetCDF.putvar(nc, "v",   Float32.(v_grid),  start=[1,1,1,timestep+1], count=[-1,-1,-1,1])
     NetCDF.putvar(nc, "t",   Float32.(t_grid),  start=[1,1,1,timestep+1], count=[-1,-1,-1,1])
