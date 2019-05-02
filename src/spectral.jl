@@ -6,16 +6,16 @@
 el2 = zeros(Real, mx,nx)
 el2⁻¹ = zeros(Real, mx,nx)
 el4 = zeros(Real, mx,nx)
-trfilt = zeros(Real, mx,nx)
+trfilt = zeros(Complex{Real}, mx,nx)
 for n in 1:nx
     for m in 1:mx
         N = m - 2 + n
         el2[m,n] = Real(N*(N + 1))/rearth^two
         el4[m,n] = el2[m,n]^two
         if N <= trunc
-            trfilt[m,n] = one
+            trfilt[m,n] = Complex{Real}(one)
         else
-            trfilt[m,n] = zero
+            trfilt[m,n] = Complex{Real}(zero)
         end
     end
 end
@@ -56,8 +56,8 @@ for m in 1:mx
 end
 
 # Laplacian and inverse Laplacian
-∇²(field) = -field*el2
-∇⁻²(field) = -field*el2⁻¹
+∇²(field) = -field.*el2
+∇⁻²(field) = -field.*el2⁻¹
 
 # Spectral transforms
 spec_to_grid(input; scale=false) = fourier_inv(legendre_inv(input), scale=scale)
@@ -146,5 +146,5 @@ function vdspec!(ug, vg, vorm, divm, kcos)
 end
 
 function truncate(input)
-    input*trfilt
+    input.*trfilt
 end
