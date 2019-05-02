@@ -8,14 +8,13 @@ using LinearAlgebra
 # =============================================================================
 function get_weights()
     z1 = RealType(2.0)
-    eps = RealType(3.0e-14)
 
     wt = zeros(RealType, div(nlat,2))
 
     for i in 1:div(nlat,2)
         local pp
         z = cos(RealType(π)*(RealType(i) - quart)/(RealType(nlat) + half))
-        while abs(z - z1) > eps
+        while abs(z - z1) > eps(RealType)
             p1 = one
             p2 = zero
 
