@@ -11,6 +11,7 @@ include("src/legendre.jl")
 include("src/fourier.jl")
 include("src/spectral.jl")
 include("src/geopotential.jl")
+include("src/horizontal_diffusion.jl")
 include("src/input_output.jl")
 include("src/boundaries.jl")
 
