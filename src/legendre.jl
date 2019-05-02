@@ -119,7 +119,7 @@ end
 polys = zeros(Complex{Real}, mx,nx,div(nlat,2))
 for j in 1:div(nlat,2)
     poly = get_legendre_poly(j)
-    polys[:,:,j] = (poly + im*poly)
+    polys[:,:,j] = poly
 end
 
 # Computes inverse Legendre transformation
