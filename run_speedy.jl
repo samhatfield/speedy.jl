@@ -14,6 +14,7 @@ include("src/geopotential.jl")
 include("src/horizontal_diffusion.jl")
 include("src/input_output.jl")
 include("src/boundaries.jl")
+include("src/diagnostics.jl")
 
 # Time step counter
 model_step = 1
