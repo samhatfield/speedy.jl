@@ -12,6 +12,7 @@ include("src/fourier.jl")
 include("src/spectral.jl")
 include("src/geopotential.jl")
 include("src/input_output.jl")
+include("src/boundaries.jl")
 
 # Time step counter
 model_step = 1
