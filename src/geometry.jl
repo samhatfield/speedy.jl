@@ -2,8 +2,8 @@
 hsg = convert(Array{Real}, [0.0, 0.05, 0.14, 0.26, 0.42, 0.6, 0.77, 0.9, 1.0])
 
 # Full (u,v,T) levels and layer thicknesses
-fsg = hsg[2:end] - hsg[1:end-1]
-dhs = half*fsg
+dhs = hsg[2:end] - hsg[1:end-1]
+fsg = half*(hsg[2:end] + hsg[1:end-1])
 
 # Additional functions of σ
 dhsr = half/dhs
