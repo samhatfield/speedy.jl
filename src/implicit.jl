@@ -1,3 +1,7 @@
+dmp1 = zeros(RealType, mx, nx)
+dmp1d = zeros(RealType, mx, nx)
+dmp1s = zeros(RealType, mx, nx)
+
 xa = zeros(RealType, nlev, nlev)
 xb = zeros(RealType, nlev, nlev)
 xc = zeros(RealType, nlev, nlev)
@@ -25,15 +29,15 @@ dhsx = zeros(RealType, nlev)
 # implicit, are defined in initialize_implicit)
 function initialize_implicit(Δt)
     # 1. Constants for backwards implicit biharmonic diffusion
-    dmp1  = one/(one + dmp*Δt)
-    dmp1d = one/(one + dmpd*Δt)
-    dmp1s = one/(one + dmps*Δt)
+    dmp1  = one./(one .+ dmp*Δt)
+    dmp1d = one./(one .+ dmpd*Δt)
+    dmp1s = one./(one .+ dmps*Δt)
 
     # 1. Constants for implicit gravity wave computation
     # reference atmosphere, function of sigma only
     γ_g = γ/(RealType(1000.0)*g)
 
-    tref = RealType(288.0)*max.(RealType(0.2), fsg[k]).^(R*γ_g)
+    tref = RealType(288.0)*max.(RealType(0.2), fsg).^(R*γ_g)
     tref1 = R*tref
     tref2 = akap*tref
     tref3 = fsgr.*tref
@@ -50,6 +54,7 @@ function initialize_implicit(Δt)
     end
 
     #T(K) = TEX(K)+YA(K,K')*D(K') + XA(K,K')*SIG(K')
+    ya = zeros(RealType, nlev, nlev)
     for k in 1:nlev
         for k1 in 1:nlev
             ya[k,k1] = -akap*tref[k]*dhs[k1]
@@ -136,9 +141,9 @@ end
 #  Input/output : divU_tend = divergence tendency
 #                 tem_tend   = temperature tendency
 #                 pₛ_tend  = tendency of log(surface pressure)
-function implicit_terms(div, tem_tend, pₛ_tend)
+function implicit_terms!(divU_tend, tem_tend, pₛ_tend)
     ye = zeros(Complex{RealType}, mx, nx, nlev)
-    yf = zeros(ye)
+    yf = zeros(Complex{RealType}, mx, nx, nlev)
 
     for k1 in 1:nlev
         for k in 1:nlev
