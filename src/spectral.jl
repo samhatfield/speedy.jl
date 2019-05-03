@@ -65,7 +65,7 @@ grid_to_spec(input) = legendre_dir(fourier_dir(input))
 
 function grad!(ψ, psdx, psdy)
     for n in 1:nx
-        psdx[:,n] = gradx*ψ[:,n]*im
+        psdx[:,n] = gradx.*ψ[:,n]*im
     end
 
     for m in 1:mx
@@ -85,8 +85,8 @@ function vds!(ucosm, vcosm, vorm, divm)
     zc = zeros(mx,nx)
 
     for n in 1:nx
-        zp[:,n] = gradx*ucosm[:,n]*im
-        zc[:,n] = gradx*vcosm[:,n]*im
+        zp[:,n] = gradx.*ucosm[:,n]*im
+        zc[:,n] = gradx.*vcosm[:,n]*im
     end
 
     for m in 1:mx
@@ -124,6 +124,9 @@ function uvspec!(vorm, divm, ucosm, vcosm )
 end
 
 function vdspec!(ug, vg, vorm, divm, kcos)
+    ug1 = zeros(RealType, nlon, nlat)
+    vg1 = zeros(RealType, nlon, nlat)
+
     if kcos
         for j in 1:nlat
             for i in 1:nlon
