@@ -21,6 +21,7 @@ include("src/input_output.jl")
 include("src/boundaries.jl")
 include("src/diagnostics.jl")
 include("src/prognostics.jl")
+include("src/implicit.jl")
 
 # Time step counter
 model_step = 1
