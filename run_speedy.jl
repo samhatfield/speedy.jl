@@ -1,3 +1,8 @@
+using NetCDF
+using FFTW
+using LinearAlgebra
+using Dates
+
 # Define global model precision
 RealType = Float64
 

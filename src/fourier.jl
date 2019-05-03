@@ -1,5 +1,3 @@
-using FFTW
-
 # Transforms Fourier coefficients to grid-point data.
 function fourier_inv(input; scale=false)
     output = zeros(RealType, nlon, nlat)

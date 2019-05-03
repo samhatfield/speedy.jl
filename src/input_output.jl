@@ -1,5 +1,3 @@
-using NetCDF
-
 # Load boundary condition from given file
 function load_boundary_file(file_name, field_name)
     # Read variable from boundary file

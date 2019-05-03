@@ -1,8 +1,6 @@
 # Initializes Legendre transforms and constants used for other
 # subroutines that manipulate spherical harmonics
 
-using LinearAlgebra
-
 # =============================================================================
 # Beginning of function definitions
 # =============================================================================
