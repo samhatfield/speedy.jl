@@ -52,7 +52,7 @@ function output(timestep)
         [timevar, lonvar, latvar, levvar, uvar, vvar, tvar, qvar, ϕvar, pₛvar])
 
     # Write dimensions to file
-    NetCDF.putvar(nc, "time", [timestep*24.0/Float32(n_steps_day)])
+    NetCDF.putvar(nc, "time", [(timestep - 1)*24.0/Float32(n_steps_day)])
     NetCDF.putvar(nc, "lon", [3.75*k for k in 0:95])
     NetCDF.putvar(nc, "lat", [radang[k]*90.0/asin(1.0) for k in 1:nlat])
     NetCDF.putvar(nc, "lev", fsg)
@@ -79,12 +79,12 @@ function output(timestep)
     println("Writing output file for $(Dates.format(current_datetime, "YYYY-mm-dd HH:MM:00"))")
 
     # Write prognostic variables to file
-    NetCDF.putvar(nc, "u",   Float32.(u_grid),  start=[1,1,1,timestep+1], count=[-1,-1,-1,1])
-    NetCDF.putvar(nc, "v",   Float32.(v_grid),  start=[1,1,1,timestep+1], count=[-1,-1,-1,1])
-    NetCDF.putvar(nc, "t",   Float32.(t_grid),  start=[1,1,1,timestep+1], count=[-1,-1,-1,1])
-    NetCDF.putvar(nc, "q",   Float32.(q_grid),  start=[1,1,1,timestep+1], count=[-1,-1,-1,1])
-    NetCDF.putvar(nc, "phi", Float32.(ϕ_grid),  start=[1,1,1,timestep+1], count=[-1,-1,-1,1])
-    NetCDF.putvar(nc, "ps",  Float32.(pₛ_grid), start=[1,1,timestep+1],   count=[-1,-1,1])
+    NetCDF.putvar(nc, "u",   Float32.(u_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
+    NetCDF.putvar(nc, "v",   Float32.(v_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
+    NetCDF.putvar(nc, "t",   Float32.(t_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
+    NetCDF.putvar(nc, "q",   Float32.(q_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
+    NetCDF.putvar(nc, "phi", Float32.(ϕ_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
+    NetCDF.putvar(nc, "ps",  Float32.(pₛ_grid), start=[1,1,1],   count=[-1,-1,1])
 
     NetCDF.close(nc)
 end

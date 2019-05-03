@@ -62,7 +62,7 @@ function initialize_from_rest!(vorU, divU, tem, pₛ, tr, ϕₛ)
     check_diagnostics(vorU[:,:,:,1], divU[:,:,:,1], tem[:,:,:,1], 0)
 
     # Write initial data
-    output(0)
+    output(1)
 end
 
 # Prognostic spectral variables (updated in step)
