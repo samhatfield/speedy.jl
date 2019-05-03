@@ -19,4 +19,4 @@ const α               = RealType(0.5)                 # Coefficient for semi-im
 
 # Output parameters
 const nstdia = 36*5  # Period (number of steps) for diagnostic print-out
-const nsteps_out = 1 # Number of time steps between outputs
+const n_steps_out = 1 # Number of time steps between outputs

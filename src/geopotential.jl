@@ -10,7 +10,7 @@ end
 
 # Compute spectral geopotential from spectral temperature T and spectral topography ϕₛ, as in GFDL
 # Climate Group GCM
-function get_geopotential(t, ϕₛ)
+function get_geopotential(t)
     # 1. Bottom layer (integration over half a layer)
     ϕ[:,:,nlev] = ϕₛ + xgeop1[nlev]*t[:,:,nlev]
 
