@@ -37,3 +37,18 @@ for k in 2:nlev
         qcorv[k] = fsg[k]^qexp
     end
 end
+
+tcorh = zeros(Complex{RealType}, mx, nx)
+qcorh = zeros(Complex{RealType}, mx, nx)
+
+function do_horizontal_diffusion_2d!(field, fdt, dmp, dmp1)
+    fdt = (fdt - dmp.*field).*dmp1
+end
+
+# Add horizontal diffusion tendency of field to spectral tendency fdt at nlev
+# levels using damping coefficients dmp and dmp1
+function do_horizontal_diffusion_3d!(field, fdt, dmp, dmp1)
+    for k in 1:nlev
+        do_horizontal_diffusion_2d!(field[:,:,k], fdt[:,:,k], dmp, dmp1)
+    end
+end
