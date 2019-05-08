@@ -53,7 +53,7 @@ function get_grid_point_tendencies!(vorU_tend, divU_tend, tem_tend, pₛ_tend, t
             tr_grid[:,:,k,itr] = spec_to_grid(tr[:,:,k,j2,itr], scale=false)
         end
 
-        uvspec!(vorU[:,:,k,j2], divU[:,:,k,j2], dumc[:,:,1], dumc[:,:,2])
+        uvspec!(vorU[:,:,k,j2], divU[:,:,k,j2], @view(dumc[:,:,1]), @view(dumc[:,:,2]))
         v_grid[:,:,k] = spec_to_grid(dumc[:,:,2], scale=true)
         u_grid[:,:,k] = spec_to_grid(dumc[:,:,1], scale=true)
 
@@ -76,7 +76,7 @@ function get_grid_point_tendencies!(vorU_tend, divU_tend, tem_tend, pₛ_tend, t
 
     # Compute tendency of log(surface pressure)
     # pₛ(1,1,j2)=zero
-    grad!(pₛ[:,:,j2], dumc[:,:,1], dumc[:,:,2])
+    grad!(pₛ[:,:,j2], @view(dumc[:,:,1]), @view(dumc[:,:,2]))
     px = spec_to_grid(dumc[:,:,1], scale=true)
     py = spec_to_grid(dumc[:,:,2], scale=true)
 
@@ -140,7 +140,8 @@ function get_grid_point_tendencies!(vorU_tend, divU_tend, tem_tend, pₛ_tend, t
     end
 
     for k in 1:nlev
-        tem_tend_grid[:,:,k] = t_grid_anom[:,:,k].*div_grid[:,:,k] - (temp[:,:,k+1] + temp[:,:,k])*dhsr[k]
+        tem_tend_grid[:,:,k] = t_grid_anom[:,:,k].*div_grid[:,:,k]
+            - (temp[:,:,k+1] + temp[:,:,k])*dhsr[k]
             + fsgr[k]*t_grid_anom[:,:,k].*(σ_tend[:,:,k+1] + σ_tend[:,:,k])
             + tref3[k]*(σ_m[:,:,k+1] + σ_m[:,:,k])
             + akap*(tem_grid[:,:,k].*puv[:,:,k] - t_grid_anom[:,:,k].*dmean)
@@ -169,7 +170,8 @@ function get_grid_point_tendencies!(vorU_tend, divU_tend, tem_tend, pₛ_tend, t
         #  Convert u and v tendencies to vor and div spectral tendencies
         #  vdspec takes a grid u and a grid v and converts them to
         #  spectral vor and div
-        vdspec!(u_tend[:,:,k], v_tend[:,:,k], vorU_tend[:,:,k], divU_tend[:,:,k], true)
+        vdspec!(u_tend[:,:,k], v_tend[:,:,k],
+            @view(vorU_tend[:,:,k]), @view(divU_tend[:,:,k]), true)
 
         # Divergence tendency
         # add -lapl(0.5*(u**2+v**2)) to div tendency
@@ -179,13 +181,13 @@ function get_grid_point_tendencies!(vorU_tend, divU_tend, tem_tend, pₛ_tend, t
         # Temperature tendency
         # and add div(vT) to spectral t tendency
         vdspec!(-u_grid[:,:,k].*t_grid_anom[:,:,k], -v_grid[:,:,k].*t_grid_anom[:,:,k],
-            dumc[:,:,1], tem_tend[:,:,k], true)
+            dumc[:,:,1], @view(tem_tend[:,:,k]), true)
         tem_tend[:,:,k] += grid_to_spec(tem_tend_grid[:,:,k])
 
         # tracer tendency
         for itr in 1:n_trace
             vdspec!(-u_grid[:,:,k].*tr_grid[:,:,k,itr], -v_grid[:,:,k].*tr_grid[:,:,k,itr],
-                dumc[:,:,1], tr_tend[:,:,k,itr], true)
+                dumc[:,:,1], @view(tr_tend[:,:,k,itr]), true)
             tr_tend[:,:,k,itr] += grid_to_spec(tr_tend_grid[:,:,k,itr])
         end
     end

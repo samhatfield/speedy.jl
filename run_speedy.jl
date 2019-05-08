@@ -40,7 +40,7 @@ while current_datetime != end_datetime
 
     step(2, 2, two*Δt)
 
-    #check_diagnostics(vorU[:,:,:,2], divU[:,:,:,2], tem[:,:,:,2], model_step)
+    check_diagnostics(vorU[:,:,:,2], divU[:,:,:,2], tem[:,:,:,2], model_step)
 
     # Increment time step counter
     global model_step += 1

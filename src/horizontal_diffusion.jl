@@ -49,6 +49,6 @@ end
 # levels using damping coefficients dmp and dmp1
 function do_horizontal_diffusion_3d!(field, fdt, dmp, dmp1)
     for k in 1:nlev
-        do_horizontal_diffusion_2d!(field[:,:,k], fdt[:,:,k], dmp, dmp1)
+        do_horizontal_diffusion_2d!(field[:,:,k], @view(fdt[:,:,k]), dmp, dmp1)
     end
 end

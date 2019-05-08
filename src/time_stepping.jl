@@ -4,21 +4,17 @@ function step_field_2d!(j1, Δt, eps, input, fdt)
 
     fdt = truncate(fdt)
 
-    #println("mean tendency       = $(mean(fdt))")
-    #println("mean value before   = $(mean(input))")
-
     # The actual leap frog with the Robert filter
     fnew = input[:,:,1] + Δt*fdt
     input[:,:,1] = input[:,:,j1] + wil*eps*(input[:,:,1] - two*input[:,:,j1] + fnew)
 
     # Williams' innovation to the filter
     input[:,:,2] = fnew - (one - wil)*eps*(input[:,:,1] - two*input[:,:,j1] + fnew)
-    #println("mean value after    = $(mean(input))")
 end
 
 function step_field_3d!(j1, Δt, eps, input, fdt)
     for k in 1:nlev
-        step_field_2d!(j1, Δt, eps, input[:,:,k,:], fdt[:,:,k])
+        step_field_2d!(j1, Δt, eps, @view(input[:,:,k,:]), fdt[:,:,k])
     end
 end
 
@@ -96,11 +92,11 @@ function step(j1, j2, Δt)
         end
     end
 
-    do_horizontal_diffusion_3d!(ctmp, tr_tend[:,:,:,1], dmpd, dmp1d)
+    do_horizontal_diffusion_3d!(ctmp, @view(tr_tend[:,:,:,1]), dmpd, dmp1d)
 
     if n_trace > 1
         for itr in 2:n_trace
-            do_horizontal_diffusion_3d!(tr[:,:,:,1,itr], tr_tend[:,:,:,itr], dmp, dmp1)
+            do_horizontal_diffusion_3d!(tr[:,:,:,1,itr], @view(tr_tend[:,:,:,itr]), dmp, dmp1)
         end
     end
 
@@ -120,6 +116,6 @@ function step(j1, j2, Δt)
     step_field_3d!(j1, Δt, eps, tem, tem_tend)
 
     for itr in 1:n_trace
-        step_field_3d!(j1, Δt, eps, tr[:,:,:,:,itr], tr_tend[:,:,:,itr])
+        step_field_3d!(j1, Δt, eps, @view(tr[:,:,:,:,itr]), tr_tend[:,:,:,itr])
     end
 end
