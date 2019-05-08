@@ -81,8 +81,8 @@ function grad!(ψ, psdx, psdy)
 end
 
 function vds!(ucosm, vcosm, vorm, divm)
-    zp = zeros(mx,nx)
-    zc = zeros(mx,nx)
+    zp = zeros(Complex, mx,nx)
+    zc = zeros(Complex, mx,nx)
 
     for n in 1:nx
         zp[:,n] = gradx.*ucosm[:,n]*im
