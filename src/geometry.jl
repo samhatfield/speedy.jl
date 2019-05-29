@@ -1,41 +1,67 @@
-# σ half levels
-hsg = convert(Array{RealType}, [0.0, 0.05, 0.14, 0.26, 0.42, 0.6, 0.77, 0.9, 1.0])
-
-# Full (u,v,T) levels and layer thicknesses
-dhs = hsg[2:end] - hsg[1:end-1]
-fsg = half*(hsg[2:end] + hsg[1:end-1])
-
-# Additional functions of σ
-dhsr = half/dhs
-fsgr = akap/(two*fsg)
-
-# Functions of latitudes
-sinlat_half = zeros(RealType, div(nlat,2))
-coslat_half = zeros(RealType, div(nlat,2))
-sinlat      = zeros(RealType, nlat)
-coslat      = zeros(RealType, nlat)
-radang      = zeros(RealType, nlat)
-cosg        = zeros(RealType, nlat)
-cosgr       = zeros(RealType, nlat)
-cosgr2      = zeros(RealType, nlat)
-for j in 1:div(nlat,2)
-    jj = nlat + 1 - j
-    # TODO: swap sinlat and coslat
-    sinlat_half[j] = cos(RealType(π)*(RealType(j) - quart)/(RealType(nlat) + half))
-    coslat_half[j] = √(one - sinlat_half[j]^two)
-    sinlat[j]  = -sinlat_half[j]
-    sinlat[jj] =  sinlat_half[j]
-    coslat[j]  = coslat_half[j]
-    coslat[jj] = coslat_half[j]
-    radang[j]  = -asin(sinlat_half[j])
-    radang[jj] =  asin(sinlat_half[j])
-    cosg[j]    = coslat_half[j]
-    cosg[jj]   = coslat_half[j]
-    cosgr[j]   = one/coslat_half[j]
-    cosgr[jj]  = one/coslat_half[j]
-    cosgr2[j]  = one/(coslat_half[j]^two)
-    cosgr2[jj] = one/(coslat_half[j]^two)
+# Model geometry parameters
+struct Geometry{T<:AbstractFloat, V<:AbstractVector}
+    # Spectral truncation
+    trunc::Int
+    # Number of longitudes, latitudes and vertical levels
+    nlon::Int
+    nlat::Int
+    nlev::Int
+    # Number of total and zonal wavenumbers
+    nx::Int
+    mx::Int
+    # σ half levels, full levels and thicknesses
+    σ_half::V
+    σ_full::V
+    σ_thick::V
+    # Additional functions of σ
+    σ_half⁻¹_2::V
+    σ_f::V
+    # Sines and cosines of latitude
+    sinlat_half::V
+    coslat_half::V
+    sinlat::V
+    coslat::V
+    radang::V
+    cosg::V
+    cosg⁻¹::V
+    cosg⁻²::V
+    # Coriolis frequency
+    f::V
 end
 
-# Coriolis frequency
-f = two*Ω*sinlat
+function Geometry(T, nlon, nlat, nlev, trunc)
+    # σ half levels
+    if nlev == 8
+        σ_half = convert(Array{T}, [0.0, 0.05, 0.14, 0.26, 0.42, 0.6, 0.77, 0.9, 1.0])
+    else
+        @error "Only 8 model levels are currently supported"
+    end
+
+    # Full (u,v,T) levels and layer thicknesses
+    σ_full = convert(AbstractVector{T}, 0.5(σ_half[2:end] + σ_half[1:end-1]))
+    σ_thick = convert(AbstractVector{T}, σ_half[2:end] - σ_half[1:end-1])
+
+    # Additional functions of σ
+    σ_half⁻¹_2 = convert(AbstractVector{T}, 1.0./(2.0σ_thick))
+    # TODO: replace 2.0/7.0 with akap variable
+    σ_f = convert(AbstractVector{T}, (2.0/7.0)./(2.0σ_full))
+
+    # Sines and cosines of latitude
+    # TODO: swap sinlat and coslat
+    sinlat_half = [ cos(T(π)*(T(j) - 0.25)/(T(nlat) + 0.5)) for j=1:div(nlat,2) ]
+    coslat_half = sqrt.(T(1.0) .- sinlat_half.^T(2.0))
+    sinlat = vcat(-sinlat_half, reverse(sinlat_half))
+    coslat = vcat(coslat_half, coslat_half)
+    radang = vcat(-asin.(sinlat_half), asin.(sinlat_half))
+    cosg   = vcat(coslat_half, coslat_half)
+    cosg⁻¹ = T(1.0)./cosg
+    cosg⁻² = T(1.0)./cosg.^T(2.0)
+
+    # Coriolis frequency
+    # TODO: replace 7.292e-05 with Ω variable
+    f = T(2.0)*T(7.292e-05)*sinlat
+
+    Geometry{T, typeof(σ_full)}(trunc, nlon, nlat, nlev, trunc+2, trunc+1, σ_half, σ_full, σ_thick,
+                                σ_half⁻¹_2, σ_f, sinlat_half, coslat_half, sinlat, coslat, radang,
+                                cosg, cosg⁻¹, cosg⁻², f)
+end
