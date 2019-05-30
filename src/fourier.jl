@@ -13,7 +13,7 @@ function fourier_inv(geometry::Geometry, input; scale=false)
 
         # Scale by cosine(lat) if needed
         if scale
-            output[:,j] *= geometry.cosgr[j]
+            output[:,j] *= geometry.cosg⁻¹[j]
         end
     end
     output
