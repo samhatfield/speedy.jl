@@ -50,9 +50,9 @@ function Geometry(T, constants, nlon, nlat, nlev, trunc)
     sinlat_half = [ cos(T(π)*(T(j) - 0.25)/(T(nlat) + 0.5)) for j=1:div(nlat,2) ]
     coslat_half = sqrt.(T(1.0) .- sinlat_half.^T(2.0))
     sinlat = vcat(-sinlat_half, reverse(sinlat_half))
-    coslat = vcat(coslat_half, coslat_half)
-    radang = vcat(-asin.(sinlat_half), asin.(sinlat_half))
-    cosg   = vcat(coslat_half, coslat_half)
+    coslat = vcat(coslat_half, reverse(coslat_half))
+    radang = asin.(sinlat)
+    cosg   = coslat
     cosg⁻¹ = T(1.0)./cosg
     cosg⁻² = T(1.0)./cosg.^T(2.0)
 
