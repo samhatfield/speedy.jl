@@ -3,7 +3,7 @@ using NetCDF
 # Load boundary condition from given file
 function load_boundary_file(file_name, field_name)
     if !isfile("../data/boundaries/t30/clim/$file_name")
-        @error "File $file_name not found in \$SPEEDYROOT/data/boundaries/t30/clim/"
+        throw("File $file_name not found in \$SPEEDYROOT/data/boundaries/t30/clim/")
     end
 
     # Read variable from boundary file

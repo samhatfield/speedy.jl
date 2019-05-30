@@ -34,7 +34,7 @@ function Geometry(T, constants, nlon, nlat, nlev, trunc)
     if nlev == 8
         σ_half = convert(Array{T}, [0.0, 0.05, 0.14, 0.26, 0.42, 0.6, 0.77, 0.9, 1.0])
     else
-        @error "Only 8 model levels are currently supported"
+        throw("Only 8 model levels are currently supported")
     end
 
     # Full (u,v,T) levels and layer thicknesses
