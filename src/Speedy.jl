@@ -1,7 +1,5 @@
 module Speedy
 
-using
-    Dates
 
 export
     Model
