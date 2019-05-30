@@ -188,11 +188,11 @@ function vds!(geometry::Geometry, spectral_trans::SpectralTrans, ucosm, vcosm, v
 end
 
 function uvspec!(geometry::Geometry, spectral_trans::SpectralTrans, vorm, divm, ucosm, vcosm )
-    @unpack trunc, mx = geometry
+    @unpack trunc, mx, nx = geometry
     @unpack uvdx, uvdyp, uvdym = spectral_trans
 
-    zp = uvdx.*vorm*Complex{typeof(vorm[0,0])}(0.0 + 1.0im)
-    zc = uvdx.*divm*Complex{typeof(vorm[0,0])}(0.0 + 1.0im)
+    zp = uvdx.*vorm*Complex{typeof(vorm[1,1]).types[1]}(0.0 + 1.0im)
+    zc = uvdx.*divm*Complex{typeof(vorm[1,1]).types[1]}(0.0 + 1.0im)
 
     for m in 1:mx
         ucosm[m,1]  =  zc[m,1] - uvdyp[m,1]*vorm[m,2]
