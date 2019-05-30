@@ -4,6 +4,7 @@ using Parameters
 
 export Model
 
+include("params.jl")
 include("constants.jl")
 include("geometry.jl")
 include("spectral_trans.jl")

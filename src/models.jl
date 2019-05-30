@@ -1,6 +1,7 @@
 using Dates
 
 mutable struct Model
+    params::Params
     constants::Constants
     geometry::Geometry
     current_datetime::DateTime
@@ -16,6 +17,8 @@ function Model(;
     nlev,
     # Model spectral resolution
     trunc,
+    # Number of time steps per day
+    n_steps_day,
     # Real number type
     real_type = Float64,
     # Radius of Earth
@@ -26,7 +29,9 @@ function Model(;
     g = 9.81,
     # Start and end datetimes
     start_datetime = DateTime(1982,1,1),
-    end_datetime = DateTime(1982,1,2)
+    end_datetime = DateTime(1982,1,2),
+    # Frequency of diagnostic checks
+    n_diag = 36*5
     )
 
     # Default gas parameters
@@ -46,11 +51,12 @@ function Model(;
 
     current_datetime = start_datetime
 
+    params = Params(n_diag, n_steps_day)
     constants = Constants(real_type, Rₑ, Ω, g, akap, R, γ, hscale, hshum, refrh1, thd, thdd, thds,
                           tdrs)
     geometry = Geometry(real_type, constants, nlon, nlat, nlev, trunc)
     spectral_trans = SpectralTrans(real_type, geometry, constants.Rₑ)
     boundaries = Boundaries(real_type, geometry, spectral_trans, g)
 
-    Model(constants, geometry, current_datetime, end_datetime, spectral_trans, boundaries)
+    Model(params, constants, geometry, current_datetime, end_datetime, spectral_trans, boundaries)
 end
