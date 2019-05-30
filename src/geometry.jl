@@ -27,6 +27,9 @@ struct Geometry{V<:AbstractVector}
     cosg⁻²::V
     # Coriolis frequency
     f::V
+    # Geopotential calculation work arrays
+    xgeop1::V
+    xgeop2::V
 end
 
 function Geometry(T, constants, nlon, nlat, nlev, trunc)
@@ -59,7 +62,17 @@ function Geometry(T, constants, nlon, nlat, nlev, trunc)
     # Coriolis frequency
     f = T(2.0)*constants.Ω*sinlat
 
+    # Coefficients to compute geopotential
+    xgeop1 = zeros(T, nlev)
+    xgeop2 = zeros(T, nlev)
+    for k in 1:nlev
+        xgeop1[k] = constants.R*log(σ_half[k+1]/σ_half[k])
+        if k != nlev
+            xgeop2[k+1] = constants.R*log(σ_full[k+1]/σ_half[k+1])
+        end
+    end
+
     Geometry{typeof(σ_full)}(trunc, nlon, nlat, nlev, trunc+2, trunc+1, σ_half, σ_full, σ_thick,
                              σ_half⁻¹_2, σ_f, sinlat_half, coslat_half, sinlat, coslat, radang,
-                             cosg, cosg⁻¹, cosg⁻², f)
+                             cosg, cosg⁻¹, cosg⁻², f, xgeop1, xgeop2)
 end

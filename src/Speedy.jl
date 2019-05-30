@@ -12,6 +12,7 @@ include("prognostics.jl")
 include("input_output.jl")
 include("boundaries.jl")
 include("diagnostics.jl")
+include("geopotential.jl")
 include("models.jl")
 
 end
