@@ -5,6 +5,7 @@ mutable struct Model
     geometry::Geometry
     current_datetime::DateTime
     end_datetime::DateTime
+    spectral_trans::SpectralTrans
 end
 
 function Model(;
@@ -47,6 +48,7 @@ function Model(;
     constants = Constants(real_type, Rₑ, Ω, g, akap, R, γ, hscale, hshum, refrh1, thd, thdd, thds,
                           tdrs)
     geometry = Geometry(real_type, constants, nlon, nlat, nlev, trunc)
+    spectral_trans = SpectralTrans(real_type, geometry, constants.Rₑ)
 
-    Model(constants, geometry, current_datetime, end_datetime)
+    Model(constants, geometry, current_datetime, end_datetime, spectral_trans)
 end
