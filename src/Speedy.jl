@@ -10,6 +10,7 @@ include("geometry.jl")
 include("spectral_trans.jl")
 include("input_output.jl")
 include("boundaries.jl")
+include("diagnostics.jl")
 include("models.jl")
 
 end

@@ -1,14 +1,17 @@
 # Prints global means of eddy kinetic energy and temperature.
 # Also stops the integration if the computed diagnostics are outside of
 # allowable ranges.
-function check_diagnostics(vor, div, tem, step)
-    diagnostics = zeros(RealType, nlev, 3)
+function check_diagnostics(geometry::Geometry, spectral_trans::SpectralTrans, vor, div, tem, step,
+                           print_diag=true)
+    @unpack nlev, mx, nx = geometry
+
+    diagnostics = zeros(Float64, nlev, 3)
 
     # 1. Get global-mean temperature and compute eddy kinetic energy
     for k in 1:nlev
-        diagnostics[k,3] = √(half)*real(tem[1,1,k])
+        diagnostics[k,3] = √(0.5)*real(tem[1,1,k])
 
-        temp = ∇⁻²(vor[:,:,k])
+        temp = ∇⁻²(spectral_trans, vor[:,:,k])
 
         for m in 2:mx
             for n in 1:nx
@@ -16,7 +19,7 @@ function check_diagnostics(vor, div, tem, step)
             end
         end
 
-        temp = ∇⁻²(div[:,:,k])
+        temp = ∇⁻²(spectral_trans, div[:,:,k])
 
         for m in 2:mx
             for n in 1:nx
@@ -26,7 +29,7 @@ function check_diagnostics(vor, div, tem, step)
     end
 
     # 2. Print results to screen
-    if mod(step, nstdia) == 0
+    if print_diag
         println("Step = $step")
         println(diagnostics[:,1])
         println(diagnostics[:,2])
