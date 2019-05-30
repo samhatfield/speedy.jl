@@ -17,7 +17,11 @@ function load_boundary_file(file_name, field_name)
     raw_input
 end
 
-function output(timestep)
+function output(geometry::Geometry, params::Params, spectral_trans::SpectralTrans, current_datetime,
+                timestep, prognostics::Prognostics)
+    @unpack nlon, nlat, nlev, mx, nx, σ_full, radang = geometry
+    @unpack vorU, divU, tem, pₛ, tr, ϕ = prognostics
+
     # Construct file name
     file_name = Dates.format(current_datetime, "yyyymmddHHMM.nc")
 
@@ -54,33 +58,33 @@ function output(timestep)
         atts=Dict("long_name"=>"surface_air_pressure", "units"=>"Pa"))
 
     # Create output file
-    nc = NetCDF.create("rundir/$file_name",
+    nc = NetCDF.create("$file_name",
         [timevar, lonvar, latvar, levvar, uvar, vvar, tvar, qvar, ϕvar, pₛvar])
 
     # Write dimensions to file
-    NetCDF.putvar(nc, "time", [(timestep - 1)*24.0/Float32(n_steps_day)])
+    NetCDF.putvar(nc, "time", [(timestep - 1)*24.0/Float32(params.n_steps_day)])
     NetCDF.putvar(nc, "lon", [3.75*k for k in 0:95])
     NetCDF.putvar(nc, "lat", [radang[k]*90.0/asin(1.0) for k in 1:nlat])
-    NetCDF.putvar(nc, "lev", fsg)
+    NetCDF.putvar(nc, "lev", σ_full)
 
     # Convert prognostic fields from spectral space to grid point space
-    u_grid = zeros(RealType, nlon, nlat, nlev)
-    v_grid = zeros(RealType, nlon, nlat, nlev)
-    t_grid = zeros(RealType, nlon, nlat, nlev)
-    q_grid = zeros(RealType, nlon, nlat, nlev)
-    ϕ_grid = zeros(RealType, nlon, nlat, nlev)
-    pₛ_grid = zeros(RealType, nlon, nlat)
+    u_grid = zeros(Float64, nlon, nlat, nlev)
+    v_grid = zeros(Float64, nlon, nlat, nlev)
+    t_grid = zeros(Float64, nlon, nlat, nlev)
+    q_grid = zeros(Float64, nlon, nlat, nlev)
+    ϕ_grid = zeros(Float64, nlon, nlat, nlev)
+    pₛ_grid = zeros(Float64, nlon, nlat)
     for k in 1:nlev
-        ucos = zeros(Complex{RealType}, mx, nx)
-        vcos = zeros(Complex{RealType}, mx, nx)
-        uvspec!(vorU[:,:,k,1], divU[:,:,k,1], ucos, vcos)
-        u_grid[:,:,k] = spec_to_grid(ucos, scale=true)
-        v_grid[:,:,k] = spec_to_grid(vcos, scale=true)
-        t_grid[:,:,k] = spec_to_grid(tem[:,:,k,1], scale=false)
-        q_grid[:,:,k] = spec_to_grid(tr[:,:,k,1,1], scale=false)
-        ϕ_grid[:,:,k] = spec_to_grid(ϕ[:,:,k], scale=false)
+        ucos = zeros(Complex{Float64}, mx, nx)
+        vcos = zeros(Complex{Float64}, mx, nx)
+        uvspec!(geometry, spectral_trans, vorU[:,:,k,1], divU[:,:,k,1], ucos, vcos)
+        u_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, ucos, scale=true)
+        v_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, vcos, scale=true)
+        t_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, tem[:,:,k,1])
+        q_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, tr[:,:,k,1,1])
+        ϕ_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, ϕ[:,:,k])
     end
-    pₛ_grid = spec_to_grid(pₛ[:,:,1], scale=false)
+    pₛ_grid = spec_to_grid(geometry, spectral_trans, pₛ[:,:,1])
 
     println("Writing output file for $(Dates.format(current_datetime, "YYYY-mm-dd HH:MM:00"))")
 

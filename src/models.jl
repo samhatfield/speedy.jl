@@ -8,6 +8,7 @@ mutable struct Model
     end_datetime::DateTime
     spectral_trans::SpectralTrans
     boundaries::Boundaries
+    prognostics::Prognostics
 end
 
 function Model(;
@@ -30,6 +31,10 @@ function Model(;
     # Start and end datetimes
     start_datetime = DateTime(1982,1,1),
     end_datetime = DateTime(1982,1,2),
+    # Name of restart file
+    restart_file = nothing,
+    # Number of tracers (including humidity)
+    n_tr = 1,
     # Frequency of diagnostic checks
     n_diag = 36*5
     )
@@ -57,6 +62,15 @@ function Model(;
     geometry = Geometry(real_type, constants, nlon, nlat, nlev, trunc)
     spectral_trans = SpectralTrans(real_type, geometry, constants.Rₑ)
     boundaries = Boundaries(real_type, geometry, spectral_trans, g)
+
+    if restart_file == nothing
+        prognostics = initialize_from_rest(real_type, geometry, constants, boundaries.ϕ₀ₛ,
+                                           spectral_trans, n_tr)
+       # Write initial data
+       output(geometry, params, spectral_trans, current_datetime, 1, prognostics)
+    else
+        throw("Restart functionality not yet implemented")
+    end
 
     Model(params, constants, geometry, current_datetime, end_datetime, spectral_trans, boundaries)
 end
