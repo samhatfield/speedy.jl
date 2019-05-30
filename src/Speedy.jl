@@ -13,6 +13,7 @@ include("input_output.jl")
 include("boundaries.jl")
 include("diagnostics.jl")
 include("geopotential.jl")
+include("horizontal_diffusion.jl")
 include("models.jl")
 
 end

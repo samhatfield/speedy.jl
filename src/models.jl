@@ -9,6 +9,7 @@ mutable struct Model
     spectral_trans::SpectralTrans
     boundaries::Boundaries
     prognostics::Prognostics
+    horizontal_diffusion::HorizontalDiffusion
 end
 
 function Model(;
@@ -48,17 +49,11 @@ function Model(;
     hscale = 7.5       # Reference scale height for pressure (in km)
     hshum  = 2.5       # Reference scale height for specific humidity (in km)
     refrh1 = 0.7       # Reference relative humidity of near-surface air
-    thd    = 2.4       # Max damping time (in hours) for horizontal diffusion (del^6) of temperature
-                       # and vorticity
-    thdd   = 2.4       # Max damping time (in hours) for horizontal diffusion (del^6) of divergence
-    thds   = 12.0      # Max damping time (in hours) for extra diffusion (del^2) in the stratosphere
-    tdrs   = 24.0*30.0 # Damping time (in hours) for drag on zonal-mean wind in the stratosphere
 
     current_datetime = start_datetime
 
     params = Params(n_diag, n_steps_day)
-    constants = Constants(real_type, Rₑ, Ω, g, akap, R, γ, hscale, hshum, refrh1, thd, thdd, thds,
-                          tdrs)
+    constants = Constants(real_type, Rₑ, Ω, g, akap, R, γ, hscale, hshum, refrh1)
     geometry = Geometry(real_type, constants, nlon, nlat, nlev, trunc)
     spectral_trans = SpectralTrans(real_type, geometry, constants.Rₑ)
     boundaries = Boundaries(real_type, geometry, spectral_trans, g)
@@ -72,5 +67,8 @@ function Model(;
         throw("Restart functionality not yet implemented")
     end
 
-    Model(params, constants, geometry, current_datetime, end_datetime, spectral_trans, boundaries)
+    horizontal_diffusion = HorizontalDiffusion(real_type, geometry, constants)
+
+    Model(params, constants, geometry, current_datetime, end_datetime, spectral_trans, boundaries,
+          prognostics, horizontal_diffusion)
 end
