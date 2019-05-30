@@ -1,5 +1,5 @@
 # Model geometry parameters
-struct Geometry{T<:AbstractFloat, V<:AbstractVector}
+struct Geometry{V<:AbstractVector}
     # Spectral truncation
     trunc::Int
     # Number of longitudes, latitudes and vertical levels
@@ -29,7 +29,7 @@ struct Geometry{T<:AbstractFloat, V<:AbstractVector}
     f::V
 end
 
-function Geometry(T, nlon, nlat, nlev, trunc)
+function Geometry(T, constants, nlon, nlat, nlev, trunc)
     # σ half levels
     if nlev == 8
         σ_half = convert(Array{T}, [0.0, 0.05, 0.14, 0.26, 0.42, 0.6, 0.77, 0.9, 1.0])
@@ -43,8 +43,7 @@ function Geometry(T, nlon, nlat, nlev, trunc)
 
     # Additional functions of σ
     σ_half⁻¹_2 = convert(AbstractVector{T}, 1.0./(2.0σ_thick))
-    # TODO: replace 2.0/7.0 with akap variable
-    σ_f = convert(AbstractVector{T}, (2.0/7.0)./(2.0σ_full))
+    σ_f = convert(AbstractVector{T}, constants.akap./(2.0σ_full))
 
     # Sines and cosines of latitude
     # TODO: swap sinlat and coslat
@@ -58,10 +57,9 @@ function Geometry(T, nlon, nlat, nlev, trunc)
     cosg⁻² = T(1.0)./cosg.^T(2.0)
 
     # Coriolis frequency
-    # TODO: replace 7.292e-05 with Ω variable
-    f = T(2.0)*T(7.292e-05)*sinlat
+    f = T(2.0)*constants.Ω*sinlat
 
-    Geometry{T, typeof(σ_full)}(trunc, nlon, nlat, nlev, trunc+2, trunc+1, σ_half, σ_full, σ_thick,
-                                σ_half⁻¹_2, σ_f, sinlat_half, coslat_half, sinlat, coslat, radang,
-                                cosg, cosg⁻¹, cosg⁻², f)
+    Geometry{typeof(σ_full)}(trunc, nlon, nlat, nlev, trunc+2, trunc+1, σ_half, σ_full, σ_thick,
+                             σ_half⁻¹_2, σ_f, sinlat_half, coslat_half, sinlat, coslat, radang,
+                             cosg, cosg⁻¹, cosg⁻², f)
 end
