@@ -10,6 +10,7 @@ mutable struct Model
     boundaries::Boundaries
     prognostics::Prognostics
     horizontal_diffusion::HorizontalDiffusion
+    implicit::Implicit
 end
 
 function Model(;
@@ -52,7 +53,7 @@ function Model(;
 
     current_datetime = start_datetime
 
-    params = Params(n_diag, n_steps_day)
+    params = Params(n_diag, n_steps_day, 86400.0/real_type(n_steps_day), real_type(0.5),)
     constants = Constants(real_type, Rₑ, Ω, g, akap, R, γ, hscale, hshum, refrh1)
     geometry = Geometry(real_type, constants, nlon, nlat, nlev, trunc)
     spectral_trans = SpectralTrans(real_type, geometry, constants.Rₑ)
@@ -68,7 +69,8 @@ function Model(;
     end
 
     horizontal_diffusion = HorizontalDiffusion(real_type, geometry, constants)
+    implicit = Implicit(real_type, geometry, constants, params, horizontal_diffusion)
 
     Model(params, constants, geometry, current_datetime, end_datetime, spectral_trans, boundaries,
-          prognostics, horizontal_diffusion)
+          prognostics, horizontal_diffusion, implicit)
 end

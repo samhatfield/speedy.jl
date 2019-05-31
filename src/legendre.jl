@@ -1,5 +1,3 @@
-using LinearAlgebra
-
 function get_leg_weights(T, geometry::Geometry)
     nlat = geometry.nlat
 

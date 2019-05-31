@@ -1,6 +1,6 @@
 module Speedy
 
-using Parameters
+using Parameters, LinearAlgebra
 
 export Model
 
@@ -14,6 +14,7 @@ include("boundaries.jl")
 include("diagnostics.jl")
 include("geopotential.jl")
 include("horizontal_diffusion.jl")
+include("implicit.jl")
 include("models.jl")
 
 end
