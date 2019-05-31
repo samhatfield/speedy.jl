@@ -2,11 +2,11 @@ mutable struct Prognostics{A2<:AbstractArray, A3<:AbstractArray, A4<:AbstractArr
                            A5<:AbstractArray}
     # Prognostic spectral variables
     # Vorticity
-    vorU::A4
+    ξ::A4
     # Divergence
-    divU::A4
+    D::A4
     # Absolute temperature
-    tem::A4
+    Tₐ::A4
     # Log of (normalised) surface pressure (p_s/p0)
     pₛ::A3
     # Number of tracers
@@ -30,12 +30,12 @@ function initialize_from_rest(T, geometry::Geometry, constants::Constants, ϕ₀
         throw("Currently only one tracer is supported (specific humidity)")
     end
 
-    tem  = zeros(Complex{T}, mx, nx, nlev, 2)
-    vorU = zeros(Complex{T}, mx, nx, nlev, 2)
-    divU = zeros(Complex{T}, mx, nx, nlev, 2)
-    pₛ   = zeros(Complex{T}, mx, nx, 2)
-    tr   = zeros(Complex{T}, mx, nx, nlev, 2, n_tr)
-    ϕ    = zeros(Complex{T}, mx, nx, nlev)
+    Tₐ = zeros(Complex{T}, mx, nx, nlev, 2)
+    ξ  = zeros(Complex{T}, mx, nx, nlev, 2)
+    D  = zeros(Complex{T}, mx, nx, nlev, 2)
+    pₛ = zeros(Complex{T}, mx, nx, 2)
+    tr = zeros(Complex{T}, mx, nx, nlev, 2, n_tr)
+    ϕ  = zeros(Complex{T}, mx, nx, nlev)
 
     surfg = zeros(T, nlon, nlat)
 
@@ -50,26 +50,26 @@ function initialize_from_rest(T, geometry::Geometry, constants::Constants, ϕ₀
     # 2.2 Set reference temperature :
     #     tropos:  T = 288 degK at z = 0, constant lapse rate
     #     stratos: T = 216 degK, lapse rate = 0
-    tem_ref  = 288.0
-    tem_top  = 216.0
+    Tₐ_ref  = 288.0
+    Tₐ_top  = 216.0
 
     # Surface and stratospheric air temperature
     surfs = -γ_g*ϕₛ
 
-    tem[1,1,1,1] = √(2.0)*Complex{T}(1.0)*tem_top
-    tem[1,1,2,1] = √(2.0)*Complex{T}(1.0)*tem_top
-    surfs[1,1] = √(2.0)*Complex{T}(1.0)*tem_ref - γ_g*ϕₛ[1,1]
+    Tₐ[1,1,1,1] = √(2.0)*Complex{T}(1.0)*Tₐ_top
+    Tₐ[1,1,2,1] = √(2.0)*Complex{T}(1.0)*Tₐ_top
+    surfs[1,1] = √(2.0)*Complex{T}(1.0)*Tₐ_ref - γ_g*ϕₛ[1,1]
 
     # Temperature at tropospheric levels
     for k in 3:nlev
-        tem[:,:,k,1] = surfs*σ_full[k]^(R*γ_g)
+        Tₐ[:,:,k,1] = surfs*σ_full[k]^(R*γ_g)
     end
 
     # 2.3 Set log(ps) consistent with temperature profile
     #     p_ref = 1013 hPa at z = 0
     for j in 1:nlat
         for i in 1:nlon
-            surfg[i,j] = log(1.013) + log(1.0 - γ_g*ϕ₀ₛ[i,j]/tem_ref)/(R*γ_g)
+            surfg[i,j] = log(1.013) + log(1.0 - γ_g*ϕ₀ₛ[i,j]/Tₐ_ref)/(R*γ_g)
         end
     end
 
@@ -96,7 +96,7 @@ function initialize_from_rest(T, geometry::Geometry, constants::Constants, ϕ₀
     end
 
     # Print diagnostics from initial conditions
-    check_diagnostics(geometry, spectral_trans, vorU[:,:,:,1], divU[:,:,:,1], tem[:,:,:,1], 0)
+    check_diagnostics(geometry, spectral_trans, ξ[:,:,:,1], D[:,:,:,1], Tₐ[:,:,:,1], 0)
 
-    Prognostics(vorU, divU, tem, pₛ, n_tr, tr, ϕ, ϕₛ)
+    Prognostics(ξ, D, Tₐ, pₛ, n_tr, tr, ϕ, ϕₛ)
 end

@@ -20,7 +20,7 @@ end
 function output(geometry::Geometry, params::Params, spectral_trans::SpectralTrans, current_datetime,
                 timestep, prognostics::Prognostics)
     @unpack nlon, nlat, nlev, mx, nx, σ_full, radang = geometry
-    @unpack vorU, divU, tem, pₛ, tr, ϕ = prognostics
+    @unpack ξ, D, Tₐ, pₛ, tr, ϕ = prognostics
 
     # Construct file name
     file_name = Dates.format(current_datetime, "yyyymmddHHMM.nc")
@@ -68,21 +68,21 @@ function output(geometry::Geometry, params::Params, spectral_trans::SpectralTran
     NetCDF.putvar(nc, "lev", σ_full)
 
     # Convert prognostic fields from spectral space to grid point space
-    u_grid = zeros(Float64, nlon, nlat, nlev)
-    v_grid = zeros(Float64, nlon, nlat, nlev)
-    t_grid = zeros(Float64, nlon, nlat, nlev)
-    q_grid = zeros(Float64, nlon, nlat, nlev)
-    ϕ_grid = zeros(Float64, nlon, nlat, nlev)
+    u_grid  = zeros(Float64, nlon, nlat, nlev)
+    v_grid  = zeros(Float64, nlon, nlat, nlev)
+    Tₐ_grid = zeros(Float64, nlon, nlat, nlev)
+    q_grid  = zeros(Float64, nlon, nlat, nlev)
+    ϕ_grid  = zeros(Float64, nlon, nlat, nlev)
     pₛ_grid = zeros(Float64, nlon, nlat)
     for k in 1:nlev
         ucos = zeros(Complex{Float64}, mx, nx)
         vcos = zeros(Complex{Float64}, mx, nx)
-        uvspec!(geometry, spectral_trans, vorU[:,:,k,1], divU[:,:,k,1], ucos, vcos)
-        u_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, ucos, scale=true)
-        v_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, vcos, scale=true)
-        t_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, tem[:,:,k,1])
-        q_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, tr[:,:,k,1,1])
-        ϕ_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, ϕ[:,:,k])
+        uvspec!(geometry, spectral_trans, ξ[:,:,k,1], D[:,:,k,1], ucos, vcos)
+        u_grid[:,:,k]  = spec_to_grid(geometry, spectral_trans, ucos, scale=true)
+        v_grid[:,:,k]  = spec_to_grid(geometry, spectral_trans, vcos, scale=true)
+        Tₐ_grid[:,:,k] = spec_to_grid(geometry, spectral_trans, Tₐ[:,:,k,1])
+        q_grid[:,:,k]  = spec_to_grid(geometry, spectral_trans, tr[:,:,k,1,1])
+        ϕ_grid[:,:,k]  = spec_to_grid(geometry, spectral_trans, ϕ[:,:,k])
     end
     pₛ_grid = spec_to_grid(geometry, spectral_trans, pₛ[:,:,1])
 
@@ -91,7 +91,7 @@ function output(geometry::Geometry, params::Params, spectral_trans::SpectralTran
     # Write prognostic variables to file
     NetCDF.putvar(nc, "u",   Float32.(u_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
     NetCDF.putvar(nc, "v",   Float32.(v_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
-    NetCDF.putvar(nc, "t",   Float32.(t_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
+    NetCDF.putvar(nc, "t",   Float32.(Tₐ_grid), start=[1,1,1,1], count=[-1,-1,-1,1])
     NetCDF.putvar(nc, "q",   Float32.(q_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
     NetCDF.putvar(nc, "phi", Float32.(ϕ_grid),  start=[1,1,1,1], count=[-1,-1,-1,1])
     NetCDF.putvar(nc, "ps",  Float32.(pₛ_grid), start=[1,1,1],   count=[-1,-1,1])
