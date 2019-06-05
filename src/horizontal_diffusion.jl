@@ -1,4 +1,5 @@
-mutable struct HorizontalDiffusion{M<:AbstractMatrix, V<:AbstractVector}
+mutable struct HorizontalDiffusion{T<:AbstractFloat, M<:AbstractMatrix, V<:AbstractVector}
+    tdrs::T
     dmp::M
     dmpd::M
     dmps::M
@@ -10,7 +11,7 @@ end
 
 function HorizontalDiffusion(T, geometry::Geometry, constants::Constants)
     @unpack nlev, trunc, mx, nx, σ_full = geometry
-    @unpack g, R, γ, hscale, hshum = constants
+    @unpack g, R, γ, hscale, hshum, refrh1 = constants
 
     # Power of Laplacian in horizontal diffusion
     npowhd = 4.0
@@ -44,7 +45,8 @@ function HorizontalDiffusion(T, geometry::Geometry, constants::Constants)
 
     # 5.2 Orographic correction terms for temperature and humidity
     #     (vertical component)
-    rgam = R*γ/(1000.0g)
+    γ_g = γ/(1000.0g)
+    rgam = R*γ_g
     qexp = hscale/hshum
 
     tcorv = zeros(Float64, nlev)
@@ -56,11 +58,19 @@ function HorizontalDiffusion(T, geometry::Geometry, constants::Constants)
         end
     end
 
-    tcorh = zeros(Complex{T}, mx, nx)
-    qcorh = zeros(Complex{T}, mx, nx)
+    corh = zeros(T, nlon, nlat)
+    for j in 1:nlat
+        for i = 1:nlon
+            corh[i,j] = γ_g*boundaries.ϕ₀ₛ[i,j]
+        end
+    end
+    tcorh = grid_to_spec(corh)
 
-    HorizontalDiffusion(convert(Array{T}, dmp), convert(Array{T}, dmpd), convert(Array{T}, dmps),
-                        convert(Array{T}, tcorv), convert(Array{T}, qcorv),
+    corh = refrh1
+    qcorh = grid_to_spec(corh)
+
+    HorizontalDiffusion(T(tdrs), convert(Array{T}, dmp), convert(Array{T}, dmpd), convert(Array{T},
+                        dmps), convert(Array{T}, tcorv), convert(Array{T}, qcorv),
                         convert(Array{T}, tcorh), convert(Array{T}, qcorh))
 
 end

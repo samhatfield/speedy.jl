@@ -31,10 +31,10 @@ end
 # the biharmonic diffusion, which is assumed always to be backwards
 # implicit, are defined in initialize_implicit)
 function Implicit(T, geometry::Geometry, constants::Constants, params::Params,
-                  horizontal_diffusion::HorizontalDiffusion)
+                  horizontal_diffusion::HorizontalDiffusion, Δt)
     @unpack nlev, mx, nx, σ_half, σ_full, σ_thick = geometry
     @unpack Rₑ, g, akap, R, γ = constants
-    @unpack Δt, α = params
+    @unpack α = params
     @unpack dmp, dmpd, dmps = horizontal_diffusion
 
     dmp1 = zeros(T, mx, nx)
