@@ -1,6 +1,6 @@
 module Speedy
 
-using Parameters, LinearAlgebra
+using Parameters, LinearAlgebra, Dates
 
 export Model
 
