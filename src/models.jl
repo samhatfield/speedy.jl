@@ -1,4 +1,5 @@
 mutable struct Model
+    real_type::DataType
     params::Params
     constants::Constants
     geometry::Geometry
@@ -69,6 +70,6 @@ function Model(;
     horizontal_diffusion = HorizontalDiffusion(real_type, geometry, constants)
     implicit = Implicit(real_type, geometry, constants, params, horizontal_diffusion)
 
-    Model(params, constants, geometry, current_datetime, end_datetime, spectral_trans, boundaries,
+    Model(real_type, params, constants, geometry, current_datetime, end_datetime, spectral_trans, boundaries,
           prognostics, horizontal_diffusion, implicit)
 end
